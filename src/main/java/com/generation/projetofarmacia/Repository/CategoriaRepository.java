@@ -1,4 +1,4 @@
-package com.generation.projetofarmacia.Repository;
+package com.generation.projetofarmacia.repository;
 
 import java.util.List;
 
@@ -9,6 +9,5 @@ import com.generation.projetofarmacia.model.Categoria;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 	
-	public List <Categoria> findAllByTituloContainingIgnoreCase(@Param("titulo") String titulo);
-
+	public List <Categoria> findAllByNomeContainingIgnoreCase(@Param("nome") String nome);
 }

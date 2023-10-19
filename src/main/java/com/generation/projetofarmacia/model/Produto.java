@@ -1,48 +1,51 @@
 package com.generation.projetofarmacia.model;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "tb_categorias")
-public class Categoria {
+@Table(name = "tb_produtos")
+public class Produto {
 	
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-	
-	@Column(unique = true)
+    
     @NotBlank(message = "O nome é um campo obrigatório")
     @Size(min = 2, max = 100, message = "O campo nome deve conter entre 2 e 100 caracteres")
     private String nome;
-
+    
     @Size(max = 1000, message = "O campo descriçao deve conter no máximo 1000 caracteres")
     private String descricao;
     
-    @Size(max = 1000, message = "O campo tipo deve conter no máximo 1000 caracteres")
-    private String tipo;
-
-    @Size(max = 1000, message = "O campo descriçao deve conter no máximo 1000 caracteres")
-    private String manipulados;
+    @NotNull(message = "O preço é um campo obrigatório")
+    @Column(precision = 10, scale = 2)
+    private BigDecimal preco;
     
     @Size(max = 1000, message = "O campo descriçao deve conter no máximo 1000 caracteres")
-    private String genericos;
+    private String marca;
     
     @Size(max = 1000, message = "O campo descriçao deve conter no máximo 1000 caracteres")
-    private String higiene;
+    private String validade;
     
-    @ManyToOne
-    @JsonIgnoreProperties("categoria")
-    private Produto produto;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "produto", cascade = CascadeType.REMOVE)
+    @JsonIgnoreProperties("produto")
+    private List<Categoria> categoria;
 
 	public Long getId() {
 		return id;
@@ -68,45 +71,37 @@ public class Categoria {
 		this.descricao = descricao;
 	}
 
-	public String getTipo() {
-		return tipo;
+	public BigDecimal getPreco() {
+		return preco;
 	}
 
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
+	public void setPreco(BigDecimal preco) {
+		this.preco = preco;
 	}
 
-	public String getManipulados() {
-		return manipulados;
+	public String getMarca() {
+		return marca;
 	}
 
-	public void setManipulados(String manipulados) {
-		this.manipulados = manipulados;
+	public void setMarca(String marca) {
+		this.marca = marca;
 	}
 
-	public String getGenericos() {
-		return genericos;
+	public String getValidade() {
+		return validade;
 	}
 
-	public void setGenericos(String genericos) {
-		this.genericos = genericos;
+	public void setValidade(String validade) {
+		this.validade = validade;
 	}
 
-	public String getHigiene() {
-		return higiene;
+	public List<Categoria> getCategoria() {
+		return categoria;
 	}
 
-	public void setHigiene(String higiene) {
-		this.higiene = higiene;
+	public void setCategoria(List<Categoria> categoria) {
+		this.categoria = categoria;
 	}
 
-	public Produto getProduto() {
-		return produto;
-	}
-
-	public void setProduto(Produto produto) {
-		this.produto = produto;
-	}
-    
     
 }

@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.generation.projetofarmacia.Repository.CategoriaRepository;
 import com.generation.projetofarmacia.model.Categoria;
+import com.generation.projetofarmacia.repository.CategoriaRepository;
+import com.generation.projetofarmacia.repository.ProdutoRepository;
 
 import jakarta.validation.Valid;
 
@@ -32,6 +33,9 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 	
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	
 	@GetMapping
 	public ResponseEntity<List<Categoria>> getAll() {
 		return ResponseEntity.ok(categoriaRepository.findAll());
@@ -43,23 +47,31 @@ public class CategoriaController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@GetMapping("/titulo/{titulo}")
+	@GetMapping("/nome/{nome}")
 	public ResponseEntity<List<Categoria>> getByTitulo(@PathVariable String titulo) {
-		return ResponseEntity.ok(categoriaRepository.findAllByTituloContainingIgnoreCase(titulo));
+		return ResponseEntity.ok(categoriaRepository.findAllByNomeContainingIgnoreCase(titulo));
 	}
 	
 	@PostMapping
 	public ResponseEntity<Categoria> post(@Valid @RequestBody Categoria categoria){
-		return ResponseEntity.status(HttpStatus.CREATED)
+		if (produtoRepository.existsById(categoria.getProduto().getId()))
+			return ResponseEntity.status(HttpStatus.CREATED)
 				.body(categoriaRepository.save(categoria));
+		
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Produto não existe!", null);
 	}
 	
 	@PutMapping
 	public ResponseEntity<Categoria> put(@Valid @RequestBody Categoria categoria){
-		return categoriaRepository.findById(categoria.getId())
-				.map(resposta -> ResponseEntity.status(HttpStatus.OK)
-						.body(categoriaRepository.save(categoria)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+		if(categoriaRepository.existsById(categoria.getId())) {
+			
+			if(produtoRepository.existsById(categoria.getProduto().getId()))
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(categoriaRepository.save(categoria));
+			
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Produto não existe", null);
+	}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
